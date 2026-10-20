@@ -3,7 +3,7 @@ title: Topics
 permalink: /
 ---
 <p>583 problems from Striver's A2Z, SDE and Blind 75 sheets, 583 written up (100%). Every article has a brute-force to optimal walkthrough with Java code that compiles and passes its own tests, and links to the judge that hosts the problem.</p>
-<div class="track track-index"><span class="track-text">You have solved 199 of 583 problems (34%). Synced from your takeUforward sheet on 2026-10-20; run <code>tools/sync_tuf.py</code> to refresh.</span><button type="button" class="shuffle nav-random" title="Open a random unsolved problem">🎲 Random problem</button><div class="bar"><span style="width:34%"></span></div></div>
+<div class="track track-index"><span class="track-text">You have solved 199 of 583 problems (34%). Synced from your takeUforward sheet on 2026-10-20; run <code>tools/sync_tuf.py</code> to refresh.</span><button type="button" class="shuffle nav-random" data-mode="unsolved" title="Open a random unsolved problem">🎲 Random unsolved</button><button type="button" class="shuffle shuffle-solved nav-random" data-mode="solved" title="Revise: open a random problem you have already solved">🔁 Random solved</button><div class="bar"><span style="width:34%"></span></div></div>
 <div class="search" data-mode="index" data-index="{{ '/assets/search-index.json' | relative_url }}" data-all="{{ '/all.html' | relative_url }}"><input id="problem-search" type="search" placeholder="Search 583 problems by name, topic or TUF ID" aria-label="Search problems" autocomplete="off" spellcheck="false"><p class="search-status" aria-live="polite"></p></div>
 <ul class="search-results" hidden></ul>
 <ul class="topic-list">

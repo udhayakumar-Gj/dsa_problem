@@ -14,7 +14,7 @@ with Java solutions). Hosted at https://udhayakumar-gj.github.io/dsa-java-articl
   `tools/sync_tuf.py` from the user's takeUforward prep-hub sheet and rendered by `build_site.py` (row class `done`,
   Solved column, counts, `done` flag in `search-index.json`, "✓ Solved" pill via `site.data.solved.ids contains page.id`).
   The user explicitly did NOT want browser-memory (localStorage) tracking; `assets/progress.js` only does 🎲 Random
-  (prefers unsolved) and the hide-solved toggle.
+  (unsolved) / 🔁 Revise (random solved) and the hide-solved toggle.
 - **TUF sheet facts**: prep-hub pages (`takeuforward.org/prep-hub/strivers-a2z-dsa-sheet`) embed a tree whose problem
   nodes carry the TUF `id` (== our `p/<id>.md`) and `/practice/dsa/<slug>` hrefs; login is at
   `takeuforward.org/get-started?type=login`. When logged in, each sheet page

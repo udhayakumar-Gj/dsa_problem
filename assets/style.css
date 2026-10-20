@@ -85,6 +85,8 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid var(--accent);bac
 .track label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .track input[type=file]{display:none}
 .track .shuffle{border-color:var(--btn-bg);color:var(--btn-bg);font-weight:600}
+.track .shuffle-solved{border-color:var(--ok);color:var(--ok)}
+.track button:disabled{opacity:.45;cursor:not-allowed}
 .track-hint{font-size:.8rem}
 .track code{font-size:.85em}
 .pill-solved{border-color:var(--ok);color:var(--ok);font-weight:600}

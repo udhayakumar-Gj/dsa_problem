@@ -35,9 +35,11 @@ tools/sync_tuf.py --from-json progress.json    # same, from a saved API response
 tools/sync_tuf.py --ids 38,43  /  --unsolve 38  /  --clear  /  --show
 ```
 
-Then commit `_data/solved.json` and the regenerated pages. Table pages can **Hide solved** rows, and
-**🎲 Random** (header link and per-page buttons) opens a random unsolved problem: from the whole sheet in the header
-and on the Topics page, from the rows currently shown on topic / All-problems pages.
+Then commit `_data/solved.json` and the regenerated pages. Table pages can **Hide solved** rows.
+
+Two pickers: **🎲 Random** opens a random *unsolved* problem and **🔁 Revise** a random *solved* one. Both exist as
+header links (whole sheet) and as buttons on the Topics page (whole sheet) and on topic / All-problems pages
+(the rows currently shown).
 
 ## Linking from the progress sheet
 

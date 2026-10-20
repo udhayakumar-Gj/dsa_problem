@@ -15,7 +15,8 @@
     <nav>
       <a href="{{ '/' | relative_url }}">Topics</a>
       <a href="{{ '/all.html' | relative_url }}">All problems</a>
-      <a href="#" class="nav-random" title="Open a random problem you have not marked done">🎲 Random</a>
+      <a href="#" class="nav-random" data-mode="unsolved" title="Open a random unsolved problem">🎲 Random</a>
+      <a href="#" class="nav-random" data-mode="solved" title="Revise: open a random problem you have already solved">🔁 Revise</a>
       <a href="{{ site.repo_url }}" rel="noopener">GitHub</a>
     </nav>
   </div>

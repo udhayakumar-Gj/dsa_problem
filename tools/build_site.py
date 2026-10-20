@@ -136,17 +136,22 @@ def track_table(ps):
     n = sum(1 for p in ps if solved(p))
     note = f' <span class="track-hint">Synced from takeUforward {SYNCED}.</span>' if SYNCED else ''
     party = ' \U0001F389' if ps and n == len(ps) else ''
+    dis_unsolved = ' disabled title="Everything here is solved"' if ps and n == len(ps) else ' title="Open a random unsolved problem from the rows shown"'
+    dis_solved = ' disabled title="Nothing solved here yet"' if n == 0 else ' title="Revise: open a random problem you have already solved, from the rows shown"'
     return (f'<div class="track track-table"><span class="track-text">{n} of {len(ps)} solved{party}</span>{note}'
             '<label><input type="checkbox" class="hide-done"> Hide solved</label>'
-            '<button type="button" class="shuffle" title="Open a random unsolved problem from the rows shown">\U0001F3B2 Random problem</button>'
+            f'<button type="button" class="shuffle" data-mode="unsolved"{dis_unsolved}>\U0001F3B2 Random unsolved</button>'
+            f'<button type="button" class="shuffle shuffle-solved" data-mode="solved"{dis_solved}>\U0001F501 Random solved</button>'
             f'<div class="bar"><span style="width:{_pct(n, len(ps))}%"></span></div></div>')
 
 def track_index():
     n = len([p for p in problems if solved(p)])
     when = f' Synced from your takeUforward sheet on {SYNCED}; run <code>tools/sync_tuf.py</code> to refresh.' if SYNCED \
         else ' Nothing synced yet: run <code>tools/sync_tuf.py</code> to pull your takeUforward progress.'
+    dis_solved = ' disabled' if n == 0 else ''
     return (f'<div class="track track-index"><span class="track-text">You have solved {n} of {len(problems)} problems ({_pct(n, len(problems))}%).{when}</span>'
-            '<button type="button" class="shuffle nav-random" title="Open a random unsolved problem">\U0001F3B2 Random problem</button>'
+            '<button type="button" class="shuffle nav-random" data-mode="unsolved" title="Open a random unsolved problem">\U0001F3B2 Random unsolved</button>'
+            f'<button type="button" class="shuffle shuffle-solved nav-random" data-mode="solved"{dis_solved} title="Revise: open a random problem you have already solved">\U0001F501 Random solved</button>'
             f'<div class="bar"><span style="width:{_pct(n, len(problems))}%"></span></div></div>')
 
 TABLE_HEAD = '<table class="prob-table"><thead><tr><th>ID</th><th>Problem</th><th>Difficulty</th><th>Section</th><th>Sheets</th><th class="plink">Problem link</th><th title="Solved on takeUforward (tools/sync_tuf.py)">Solved</th></tr></thead><tbody>'

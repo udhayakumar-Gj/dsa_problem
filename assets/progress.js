@@ -1,4 +1,4 @@
-// Random problem + "hide solved". Solved state is static: tools/sync_tuf.py writes _data/solved.json from the
+// Random unsolved / random solved (revision) + "hide solved". Solved state is static: tools/sync_tuf.py writes _data/solved.json from the
 // user's takeUforward sheet and build_site.py renders it (tr.done, the Solved column, the counts, and `done` in
 // search-index.json). The only thing kept in this browser is the hide-solved preference.
 (function () {
@@ -15,12 +15,15 @@
   }
   function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
   function articleUrl(id) { return base + '/p/' + id + '.html'; }
-  // unsolved first; when everything is solved, anything but the current problem
-  function randomId(items, exclude) {
-    var pool = items.filter(function (x) { return !x.done && String(x.id) !== String(exclude); });
-    if (!pool.length) pool = items.filter(function (x) { return String(x.id) !== String(exclude); });
+  // mode "unsolved" (default): an unsolved problem, or anything once everything is solved.
+  // mode "solved": revision, a problem already solved; null when there is none.
+  function randomId(items, exclude, mode) {
+    var wantSolved = mode === 'solved';
+    var pool = items.filter(function (x) { return !!x.done === wantSolved && String(x.id) !== String(exclude); });
+    if (!pool.length && !wantSolved) pool = items.filter(function (x) { return String(x.id) !== String(exclude); });
     return pool.length ? pick(pool).id : null;
   }
+  function modeOf(el) { return el.getAttribute('data-mode') === 'solved' ? 'solved' : 'unsolved'; }
 
   var indexP = null;
   function problems() {
@@ -28,14 +31,16 @@
     return indexP;
   }
 
-  // header link and the Topics-page button: random unsolved problem from the whole sheet
+  // header links and the Topics-page buttons: random problem from the whole sheet
   Array.prototype.forEach.call(document.querySelectorAll('.nav-random'), function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
+      if (a.disabled) return;
       a.classList.add('busy');
       problems().then(function (list) {
-        var id = randomId(list, body.getAttribute('data-problem-id'));
-        if (id != null) location.href = articleUrl(id); else a.classList.remove('busy');
+        var id = randomId(list, body.getAttribute('data-problem-id'), modeOf(a));
+        if (id != null) location.href = articleUrl(id);
+        else { a.classList.remove('busy'); a.title = 'Nothing solved yet: sync your takeUforward progress first'; }
       }).catch(function () { a.classList.remove('busy'); });
     });
   });
@@ -47,14 +52,19 @@
   var search = document.getElementById('problem-search');
   function refilter() { if (search) search.dispatchEvent(new Event('input')); }
 
-  var shuffle = track.querySelector('.shuffle');
-  if (shuffle) shuffle.addEventListener('click', function () {
-    var visible = rows.filter(function (tr) { return !tr.hidden; });
-    var items = (visible.length ? visible : rows).map(function (tr) {
-      return { id: tr.getAttribute('data-id'), done: tr.classList.contains('done') };
+  function itemsOf(trs) {
+    return trs.map(function (tr) { return { id: tr.getAttribute('data-id'), done: tr.classList.contains('done') }; });
+  }
+  Array.prototype.forEach.call(track.querySelectorAll('.shuffle'), function (btn) {
+    btn.addEventListener('click', function () {
+      var mode = modeOf(btn);
+      // prefer the rows the search box currently shows; fall back to the whole page
+      // (e.g. "Random solved" while solved rows are hidden)
+      var visible = rows.filter(function (tr) { return !tr.hidden; });
+      var id = randomId(itemsOf(visible), null, mode);
+      if (id == null) id = randomId(itemsOf(rows), null, mode);
+      if (id != null) location.href = articleUrl(id);
     });
-    var id = randomId(items, null);
-    if (id != null) location.href = articleUrl(id);
   });
 
   var hide = track.querySelector('.hide-done');
