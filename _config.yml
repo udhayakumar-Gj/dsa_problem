@@ -19,6 +19,7 @@ exclude:
   - out
   - README.md
   - ARTICLE_GUIDE.md
+  - CLAUDE.md
   - Gemfile
   - Gemfile.lock
 defaults:

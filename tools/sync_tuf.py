@@ -4,26 +4,35 @@
 TUF problem ids are the same numbers as this repo's p/<id>.md, so a problem marked solved on takeUforward's
 prep-hub sheet marks the matching article here. The result is static (committed), not browser memory.
 
+How TUF exposes it: the logged-in sheet page https://takeuforward.org/prep-hub/<sheet>?page=sheet embeds
+"solvedProblemIds":[...] in its server-rendered payload. This tool reads that for the A2Z, SDE and Blind 75 sheets.
+
 Usage:
   tools/sync_tuf.py --cookie "<Cookie header copied from a logged-in takeuforward.org request>"
-  tools/sync_tuf.py --from-json progress.json       # a file saved from the TUF progress API / browser
+  tools/sync_tuf.py --from-json progress.json       # output of the browser snippet below (or any JSON with ids)
   tools/sync_tuf.py --ids 38,43,41                  # add ids by hand
   tools/sync_tuf.py --unsolve 38                    # remove ids by hand
   tools/sync_tuf.py --clear                         # forget everything
   tools/sync_tuf.py --show                          # print the current list
 
 Everything except --show rewrites _data/solved.json and runs tools/build_site.py.
-Only ids that exist in _data/problems.json are kept; unknown ids are reported and dropped."""
+Only ids that exist in _data/problems.json are kept; unknown ids are reported and dropped.
+
+No cookie handy? In a logged-in takeuforward.org tab, run this in the DevTools console and save the printed JSON:
+  (async()=>{const o={};for(const s of ['strivers-a2z-dsa-sheet','strivers-sde-sheet','blind-75']){const h=await fetch(
+  '/prep-hub/'+s+'?page=sheet',{credentials:'include'}).then(r=>r.text());const m=h.replace(/\\"/g,'"').match(
+  /"solvedProblemIds":\[([^\]]*)\]/);o[s]=m?m[1].split(',').filter(Boolean).map(Number):[]}console.log(JSON.stringify(o))})()
+then: tools/sync_tuf.py --from-json that-file.json --replace"""
 import argparse, datetime, json, os, re, subprocess, sys, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, '_data', 'solved.json')
 KNOWN = {p['id']: p['title'] for p in json.load(open(os.path.join(ROOT, '_data', 'problems.json'), encoding='utf-8'))}
 
-# TUF sheets whose problems this repo covers (prep-hub slugs)
+# TUF sheets whose problems this repo covers (prep-hub slugs); their ids are this repo's p/<id>.md
 SHEETS = ['strivers-a2z-dsa-sheet', 'strivers-sde-sheet', 'blind-75']
-# Filled in from the browser's network tab: the authenticated endpoint that returns per-problem status.
-PROGRESS_URL = os.environ.get('TUF_PROGRESS_URL', '')
+SHEET_URL = 'https://takeuforward.org/prep-hub/{sheet}?page=sheet'
+SOLVED_RE = re.compile(r'"solvedProblemIds":\[([^\]]*)\]')
 
 
 def load():
@@ -61,18 +70,19 @@ def extract_ids(obj, found=None):
 
 
 def fetch_with_cookie(cookie):
-    if not PROGRESS_URL:
-        sys.exit('Set TUF_PROGRESS_URL to the progress endpoint (see CLAUDE.md) before using --cookie.')
+    """Fetch each sheet page as the logged-in user and pull solvedProblemIds out of the embedded payload."""
     found = set()
     for sheet in SHEETS:
-        url = PROGRESS_URL.replace('{sheet}', sheet)
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Cookie': cookie,
-                                                   'Origin': 'https://takeuforward.org', 'Referer': 'https://takeuforward.org/'})
+        req = urllib.request.Request(SHEET_URL.format(sheet=sheet),
+                                     headers={'User-Agent': 'Mozilla/5.0', 'Cookie': cookie, 'Accept': 'text/html'})
         try:
-            data = json.load(urllib.request.urlopen(req, timeout=30))
+            html = urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace')
         except Exception as e:                      # noqa: BLE001
             print(f'  {sheet}: {e}'); continue
-        ids = extract_ids(data)
+        m = SOLVED_RE.search(html.replace('\\"', '"'))
+        if not m:
+            print(f'  {sheet}: no solvedProblemIds in the page (cookie expired or not logged in?)'); continue
+        ids = {int(x) for x in m.group(1).split(',') if x.strip().isdigit()}
         print(f'  {sheet}: {len(ids)} solved')
         found |= ids
     return found

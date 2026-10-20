@@ -17,9 +17,12 @@ with Java solutions). Hosted at https://udhayakumar-gj.github.io/dsa-java-articl
   (prefers unsolved) and the hide-solved toggle.
 - **TUF sheet facts**: prep-hub pages (`takeuforward.org/prep-hub/strivers-a2z-dsa-sheet`) embed a tree whose problem
   nodes carry the TUF `id` (== our `p/<id>.md`) and `/practice/dsa/<slug>` hrefs; login is at
-  `takeuforward.org/get-started?type=login`; the backend is `backend-go.takeuforward.org/api/v2/...`. The
-  authenticated per-problem progress endpoint goes in `TUF_PROGRESS_URL` for `sync_tuf.py --cookie`
-  (use `{sheet}` as the placeholder for the sheet slug); `--from-json` accepts any saved response shape.
+  `takeuforward.org/get-started?type=login`. When logged in, each sheet page
+  (`/prep-hub/strivers-a2z-dsa-sheet|strivers-sde-sheet|blind-75?page=sheet`) embeds `"solvedProblemIds":[...]`
+  in its server-rendered payload; `sync_tuf.py --cookie` reads that, and `--from-json` takes the output of the
+  console snippet in the script's docstring. First sync on 2026-10-20: 199 solved (A2Z 188, SDE 117, Blind 75 35,
+  overlapping), all 199 present in this repo. The user reads progress with Claude in Chrome (logged-in profile);
+  the built-in browser pane is not logged in.
 - `tools/check_links.py` live-checks every link (LeetCode GraphQL + GFG page titles; GFG returns 200 for bad slugs).
 
 ## Workflow
