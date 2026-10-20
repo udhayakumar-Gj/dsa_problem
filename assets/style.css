@@ -32,6 +32,8 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid var(--accent);bac
 .topic-list li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .topic-list .count{display:block;color:var(--muted);font-size:.85rem}
 .prob-table td:first-child{white-space:nowrap;color:var(--muted)}
+.prob-table td.plink,.prob-table th.plink,.prob-table th:last-child{white-space:nowrap}
+.prob-table td.plink .none{color:var(--muted)}
 .todo{opacity:.55}
 .progress{height:8px;background:var(--code-bg);border-radius:999px;overflow:hidden;margin:.4em 0 1.2em}
 .progress span{display:block;height:100%;background:var(--easy)}
@@ -74,6 +76,25 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid var(--accent);bac
 .copy-btn.copied{color:var(--ok);border-color:var(--ok)}
 @keyframes flash{0%{box-shadow:0 0 0 3px var(--btn-bg)}100%{box-shadow:0 0 0 3px transparent}}
 .flash{animation:flash 1.6s ease-out;border-radius:8px}
+/* solved tracking + random problem */
+.track{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:.6em 0 .4em;font-size:.9rem;color:var(--muted)}
+.track .bar{flex-basis:100%;height:6px;background:var(--code-bg);border-radius:999px;overflow:hidden;margin-top:-2px}
+.track .bar span{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.track button,.track .file{font:inherit;font-size:.85rem;line-height:1.4;padding:4px 11px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+.track button:hover,.track .file:hover{border-color:var(--muted)}
+.track label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.track input[type=file]{display:none}
+.track .shuffle{border-color:var(--btn-bg);color:var(--btn-bg);font-weight:600}
+.track-article{margin:.4em 0 0}
+.track-hint{font-size:.8rem}
+.done-toggle{min-width:118px}
+.done-toggle.is-done{background:var(--ok);border-color:var(--ok);color:#fff}
+.done-box{width:16px;height:16px;margin:0;cursor:pointer;accent-color:var(--ok);vertical-align:middle}
+.prob-table td.done-cell{text-align:center;width:1%}
+.prob-table tr.done td:nth-child(2) a{color:var(--muted);text-decoration:line-through}
+.prob-table tr.done td:nth-child(2) a:hover{text-decoration:line-through underline}
+.topic-list .done-count{color:var(--ok);font-weight:600}
+.nav-random.busy{opacity:.5}
 /* problem search */
 .search{margin:1.2em 0 .6em}
 .search input{width:100%;font:inherit;font-size:1rem;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg)}
@@ -85,6 +106,7 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid var(--accent);bac
 .search-results li:first-child{border-top:0}
 .result-title{font-weight:600}
 .result-meta{flex-basis:100%;font-size:.82rem;color:var(--muted)}
+.result-link{font-size:.85rem;white-space:nowrap}
 .search-empty{color:var(--muted);font-size:.92rem}
 .prob-table tr[hidden],.prob-table[hidden],h2[hidden]{display:none}
 /* header on narrow screens: keep nav links on one line each and let the bar wrap */

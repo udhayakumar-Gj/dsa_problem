@@ -4,6 +4,7 @@ permalink: /
 ---
 <p>583 of 583 problems written (100%). Every article has a brute-force to optimal walkthrough with Java code that compiles and passes its own tests.</p>
 <div class="progress"><span style="width:100%"></span></div>
+<div class="track track-index"><span class="track-text">Loading your progress…</span><button type="button" class="shuffle nav-random" title="Open a random problem you have not marked done">🎲 Random problem</button><button type="button" class="export" title="Download your solved marks as a JSON file">Export progress</button><label class="file" title="Load a progress file exported from another browser or device">Import<input type="file" class="import" accept="application/json,.json"></label><button type="button" class="reset" title="Forget every solved mark stored in this browser">Reset</button><div class="bar"><span></span></div></div>
 <div class="search" data-mode="index" data-index="{{ '/assets/search-index.json' | relative_url }}" data-all="{{ '/all.html' | relative_url }}"><input id="problem-search" type="search" placeholder="Search 583 problems by name, topic or TUF ID" aria-label="Search problems" autocomplete="off" spellcheck="false"><p class="search-status" aria-live="polite"></p></div>
 <ul class="search-results" hidden></ul>
 <ul class="topic-list">

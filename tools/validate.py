@@ -67,6 +67,17 @@ for pid in ids:
     if re.search(r'@@|PLACEHOLDER|\bTODO\b', body): err(pid, 'leftover placeholder (@@ / PLACEHOLDER / TODO) in article')
     words = len(re.sub(r'```.*?```', '', body, flags=re.S).split())
     if words < 500: err(pid, f'article short ({words} words)')
+    ml = re.search(r'^leetcode:\s*(\S+)', fm, re.M)
+    if ml and not re.match(r'^https://leetcode\.com/problems/[a-z0-9-]+/$', ml.group(1)):
+        err(pid, f'leetcode link not of the form https://leetcode.com/problems/<slug>/: {ml.group(1)}')
+    mg = re.search(r'^gfg:\s*(\S+)', fm, re.M)
+    if mg and not re.match(r'^https://www\.geeksforgeeks\.org/problems/[a-z0-9-]+/\d+$', mg.group(1)):
+        err(pid, f'gfg link not of the form https://www.geeksforgeeks.org/problems/<slug>/1: {mg.group(1)}')
+    mp = re.search(r'^practice:\s*(\S+)', fm, re.M)
+    if mp and not re.match(r'^https://\S+$', mp.group(1)):
+        err(pid, f'practice link must be an https URL: {mp.group(1)}')
+    if mp and not re.search(r'^practice_site:\s*\S', fm, re.M):
+        err(pid, 'practice: needs a practice_site: label (e.g. Code360, TUF+)')
     for key in ('topic', 'section'):
         mt = re.search(rf'^{key}:\s*"?(.*?)"?\s*$', fm, re.M)
         if p and mt and mt.group(1) != p[key]: err(pid, f'{key} {mt.group(1)!r} differs from problems.json {p[key]!r}')

@@ -1,8 +1,8 @@
 title: DSA Java Articles
 description: Java solutions with brute-force to optimal explanations for every problem in Striver's A2Z, SDE and Blind 75 sheets.
-url: "https://manoshrinivasnm-glitch.github.io"
+url: "https://udhayakumar-gj.github.io"
 baseurl: "/dsa-java-articles"
-repo_url: "https://github.com/manoshrinivasnm-glitch/dsa-java-articles"
+repo_url: "https://github.com/udhayakumar-Gj/dsa-java-articles"
 markdown: kramdown
 highlighter: rouge
 kramdown:

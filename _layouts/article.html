@@ -15,9 +15,15 @@ layout: default
     {% for s in page.sheets %}<span class="pill pill-sheet">{{ s | replace: 'a2z', 'A2Z' | replace: 'sde', 'SDE' | replace: 'blind75', 'Blind 75' }}</span>{% endfor %}
   </p>
   <p class="links">
-    {% if page.leetcode %}<a href="{{ page.leetcode }}" target="_blank" rel="noopener">LeetCode ↗</a>{% endif %}
+    {% if page.leetcode %}<a href="{{ page.leetcode }}" target="_blank" rel="noopener"{% if page.leetcode_premium %} title="LeetCode Premium problem"{% endif %}>LeetCode{% if page.leetcode_premium %} 🔒{% endif %} ↗</a>{% endif %}
+    {% if page.gfg %}<a href="{{ page.gfg }}" target="_blank" rel="noopener">GeeksforGeeks ↗</a>{% endif %}
+    {% if page.practice %}<a href="{{ page.practice }}" target="_blank" rel="noopener">{{ page.practice_site | default: "Practice" }} ↗</a>{% endif %}
     {% if page.java %}<a href="{{ site.repo_url }}/blob/main/{{ page.java }}" target="_blank" rel="noopener">Java source ↗</a>{% endif %}
     <a href="{{ site.repo_url }}/edit/main/{{ page.path }}" target="_blank" rel="noopener">Edit this article ↗</a>
+  </p>
+  <p class="track track-article">
+    <button type="button" class="done-toggle" data-id="{{ page.id }}" aria-pressed="false">Mark as done</button>
+    <span class="track-hint">Stored in this browser. Export / import from the Topics page.</span>
   </p>
   <p class="actions" hidden>
     <span class="actions-label">Jump to code:</span>

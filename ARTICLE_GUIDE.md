@@ -17,7 +17,11 @@ difficulty: Easy
 topic: "Solve Problems on Arrays [Easy -> Medium -> Hard]"   # from problems.json
 section: "Medium"                                            # from problems.json
 sheets: [a2z, sde, blind75]                                  # keys of problems.json "sheets"
-leetcode: https://leetcode.com/problems/two-sum/             # omit if none
+leetcode: https://leetcode.com/problems/two-sum/             # omit if the problem is not on LeetCode
+leetcode_premium: true                                       # only when the LeetCode problem is Premium-locked
+gfg: https://www.geeksforgeeks.org/problems/key-pair5616/1    # GeeksforGeeks practice problem; required when there is no LeetCode link, optional otherwise
+practice: https://www.naukri.com/code360/problems/tree-traversals_981269   # only when neither LeetCode nor GFG hosts the problem
+practice_site: Code360                                       # label shown for the practice link (Code360, TUF+, InterviewBit, ...)
 java: java/P37_TwoSum.java
 ---
 
@@ -46,6 +50,10 @@ Bullets linking to other articles by id: [Title]({{ "/p/<id>.html" | relative_ur
 ```
 
 Rules:
+- Every problem row links to a judge: set `leetcode:` when the problem is on LeetCode, otherwise `gfg:` (the
+  `/problems/<slug>/1` practice URL, not an article), otherwise `practice:` + `practice_site:` for any other judge
+  that hosts the same problem (Code360, TUF+, InterviewBit, HackerRank...). Pure theory rows (language basics,
+  "Introduction to X") have none and show "—" in the index. `tools/build_site.py` reads these to fill the Problem link column.
 - Explain like a strong mentor: why the approach works, not just what it does. No filler, no marketing.
 - Theory rows (patterns, "Introduction to DP", "MST theory", language basics) get a **concept article**: explanation, worked examples, and Java code for every pattern or construct shown.
 - Code blocks in the article must be byte-identical to the methods in the Java file (copy them after the tests pass).

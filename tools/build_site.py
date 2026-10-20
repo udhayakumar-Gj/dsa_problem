@@ -37,6 +37,49 @@ import html
 SHEET_LABEL = {'a2z': 'A2Z', 'sde': 'SDE', 'blind75': 'B75'}
 SHEET_WORDS = {'a2z': 'a2z', 'sde': 'sde', 'blind75': 'b75 blind 75 blind75'}
 
+FM_RE = re.compile(r'^---\n(.*?)\n---\n', re.S)
+_LINKS = {}
+def article_links(p):
+    """Practice links from the article's front matter (the article is the source of truth):
+    leetcode: <url>, gfg: <url>, leetcode_premium: true (the LeetCode problem is Premium-locked)."""
+    if p['id'] in _LINKS: return _LINKS[p['id']]
+    out = {}
+    path = os.path.join(ROOT, 'p', f"{p['id']}.md")
+    if os.path.exists(path):
+        m = FM_RE.match(open(path, encoding='utf-8').read())
+        fm = m.group(1) if m else ''
+        for k in ('leetcode', 'gfg', 'practice'):
+            mm = re.search(rf'^{k}:\s*(\S+)', fm, re.M)
+            if mm: out[k] = mm.group(1)
+        mm = re.search(r'^practice_site:\s*"?([^"\n]+?)"?\s*$', fm, re.M)
+        if mm: out['practice_site'] = mm.group(1)
+        if re.search(r'^leetcode_premium:\s*true', fm, re.M): out['premium'] = True
+    _LINKS[p['id']] = out
+    return out
+
+def link_cell(l):
+    """The Problem link column: LeetCode when the problem is on LeetCode, GeeksforGeeks otherwise
+    (both when both are set, e.g. a Premium LeetCode problem with a free GFG twin), and `practice:`
+    (another judge such as Code360 or TUF+, labelled by `practice_site:`) when neither hosts the problem."""
+    e = html.escape
+    parts = []
+    if l.get('leetcode'):
+        lock = ' \U0001F512' if l.get('premium') else ''
+        title = ' title="LeetCode Premium problem"' if l.get('premium') else ''
+        parts.append(f'<a href="{e(l["leetcode"])}" target="_blank" rel="noopener"{title}>LeetCode{lock} \u2197</a>')
+    if l.get('gfg'):
+        parts.append(f'<a href="{e(l["gfg"])}" target="_blank" rel="noopener">GFG \u2197</a>')
+    if l.get('practice'):
+        parts.append(f'<a href="{e(l["practice"])}" target="_blank" rel="noopener">{e(l.get("practice_site") or "Practice")} \u2197</a>')
+    return ' \u00b7 '.join(parts) if parts else '<span class="none" title="No practice problem for this row (theory, or no judge hosts it)">\u2014</span>'
+
+def link_words(l):
+    w = []
+    if l.get('leetcode'): w += ['leetcode', 'lc'] + (['premium'] if l.get('premium') else [])
+    if l.get('gfg'): w += ['gfg', 'geeksforgeeks']
+    if l.get('practice'): w += ['practice', l.get('practice_site', '')]
+    return ' '.join(w)
+
 def norm(*parts):
     """Lower-case, drop apostrophes, everything else non-alphanumeric becomes a space (mirrors search.js)."""
     t = ' '.join(str(x) for x in parts if x).lower()
@@ -54,7 +97,7 @@ def name_text(p):
 
 def search_text(p):
     return norm(p['id'], name_text(p), p['topic'], p['section'], p['difficulty'],
-                ' '.join(SHEET_WORDS[s] for s in p['sheets']))
+                ' '.join(SHEET_WORDS[s] for s in p['sheets']), link_words(article_links(p)))
 
 def row(p):
     e = html.escape
@@ -64,9 +107,11 @@ def row(p):
     else:
         title = f'{e(p["title"])} <small>(coming soon)</small>'
     sheets = ' '.join(SHEET_LABEL[s] for s in p['sheets'])
-    return (f'<tr{cls} data-search="{e(search_text(p))}"><td>{p["id"]}</td><td>{title}</td>'
+    done = (f'<td class="done-cell"><input type="checkbox" class="done-box" aria-label="Mark {e(p["title"])} done"></td>'
+            if written(p) else '<td class="done-cell"></td>')
+    return (f'<tr{cls} data-id="{p["id"]}" data-search="{e(search_text(p))}"><td>{p["id"]}</td><td>{title}</td>'
             f'<td><span class="badge badge-{p["difficulty"].lower()}">{p["difficulty"]}</span></td>'
-            f'<td>{e(p["section"])}</td><td>{sheets}</td></tr>')
+            f'<td>{e(p["section"])}</td><td>{sheets}</td><td class="plink">{link_cell(article_links(p))}</td>{done}</tr>')
 
 def search_box(mode, placeholder, extra=''):
     return (f'<div class="search" data-mode="{mode}"{extra}>'
@@ -75,13 +120,27 @@ def search_box(mode, placeholder, extra=''):
 
 SEARCH_SCRIPT = '<script src="{{ \'/assets/search.js\' | relative_url }}?v={{ site.time | date: \'%s\' }}" defer></script>'
 
-TABLE_HEAD = '<table class="prob-table"><thead><tr><th>ID</th><th>Problem</th><th>Difficulty</th><th>Section</th><th>Sheets</th></tr></thead><tbody>'
+# progress line under the search box of every table page (filled in by assets/progress.js)
+TRACK_TABLE = ('<div class="track track-table"><span class="track-text"></span>'
+               '<label><input type="checkbox" class="hide-done"> Hide done</label>'
+               '<button type="button" class="shuffle" title="Open a random problem from this page that you have not marked done">\U0001F3B2 Random problem</button>'
+               '<div class="bar"><span></span></div></div>')
+# overall progress + backup tools on the Topics page
+TRACK_INDEX = ('<div class="track track-index"><span class="track-text">Loading your progress\u2026</span>'
+               '<button type="button" class="shuffle nav-random" title="Open a random problem you have not marked done">\U0001F3B2 Random problem</button>'
+               '<button type="button" class="export" title="Download your solved marks as a JSON file">Export progress</button>'
+               '<label class="file" title="Load a progress file exported from another browser or device">Import<input type="file" class="import" accept="application/json,.json"></label>'
+               '<button type="button" class="reset" title="Forget every solved mark stored in this browser">Reset</button>'
+               '<div class="bar"><span></span></div></div>')
+
+TABLE_HEAD = '<table class="prob-table"><thead><tr><th>ID</th><th>Problem</th><th>Difficulty</th><th>Section</th><th>Sheets</th><th class="plink">Problem link</th><th title="Solved. Stored in this browser; export it from the Topics page.">Done</th></tr></thead><tbody>'
 
 # index.md
 pct = round(100 * done_total / len(problems))
 lines = ['---', 'title: Topics', 'permalink: /', '---',
          f'<p>{done_total} of {len(problems)} problems written ({pct}%). Every article has a brute-force to optimal walkthrough with Java code that compiles and passes its own tests.</p>',
          f'<div class="progress"><span style="width:{pct}%"></span></div>',
+         TRACK_INDEX,
          search_box('index', f'Search {len(problems)} problems by name, topic or TUF ID',
                     ' data-index="{{ \'/assets/search-index.json\' | relative_url }}" data-all="{{ \'/all.html\' | relative_url }}"'),
          '<ul class="search-results" hidden></ul>',
@@ -95,7 +154,7 @@ open(os.path.join(ROOT, 'index.md'), 'w', encoding='utf-8').write('\n'.join(line
 
 # all.md
 lines = ['---', 'title: All problems', '---', f'<p>All {len(problems)} problems in sheet order, keyed by TUF ID.</p>',
-         search_box('table', 'Filter by name, topic, section, difficulty or TUF ID'), TABLE_HEAD]
+         search_box('table', 'Filter by name, topic, section, difficulty or TUF ID'), TRACK_TABLE, TABLE_HEAD]
 lines += [row(p) for p in problems]
 lines.append('</tbody></table>')
 lines.append(SEARCH_SCRIPT)
@@ -104,7 +163,7 @@ open(os.path.join(ROOT, 'all.md'), 'w', encoding='utf-8').write('\n'.join(lines)
 # topics/*.md
 for topic, ps in by_topic.items():
     lines = ['---', f'title: "{topic}"', '---', f'<p><a href="{{{{ "/" | relative_url }}}}">← All topics</a></p>',
-             search_box('table', f'Filter {len(ps)} {html.escape(topic)} problems')]
+             search_box('table', f'Filter {len(ps)} {html.escape(topic)} problems'), TRACK_TABLE]
     sections = collections.OrderedDict()
     for p in ps:
         sections.setdefault(p['section'], []).append(p)
@@ -119,7 +178,8 @@ for topic, ps in by_topic.items():
 
 # assets/search-index.json: what the Topics page searches
 index = [{'id': p['id'], 't': p['title'], 'd': p['difficulty'], 'p': p['topic'], 's': p['section'],
-          'h': [SHEET_LABEL[x] for x in p['sheets']], 'n': name_text(p), 'q': search_text(p)}
+          'h': [SHEET_LABEL[x] for x in p['sheets']], 'n': name_text(p), 'q': search_text(p),
+          'l': {k: v for k, v in article_links(p).items() if k in ('leetcode', 'gfg', 'practice', 'practice_site')}}
          for p in problems if written(p)]
 with open(os.path.join(ROOT, 'assets', 'search-index.json'), 'w', encoding='utf-8') as f:
     json.dump(index, f, ensure_ascii=False, separators=(',', ':'))

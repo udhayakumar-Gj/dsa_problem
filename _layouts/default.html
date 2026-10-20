@@ -8,13 +8,14 @@
 <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
 </head>
-<body>
+<body data-base="{{ site.baseurl }}" data-index="{{ '/assets/search-index.json' | relative_url }}"{% if page.id %} data-problem-id="{{ page.id }}"{% endif %}>
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="{{ '/' | relative_url }}">☕ DSA Java Articles</a>
     <nav>
       <a href="{{ '/' | relative_url }}">Topics</a>
       <a href="{{ '/all.html' | relative_url }}">All problems</a>
+      <a href="#" class="nav-random" title="Open a random problem you have not marked done">🎲 Random</a>
       <a href="{{ site.repo_url }}" rel="noopener">GitHub</a>
     </nav>
   </div>
@@ -25,5 +26,6 @@
 <footer class="wrap site-footer">
   <p>Written for personal interview prep. Problem ordering follows Striver's A2Z, SDE and Blind 75 sheets. Solutions in Java 21.</p>
 </footer>
+<script src="{{ '/assets/progress.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
 </body>
 </html>

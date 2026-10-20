@@ -49,8 +49,10 @@
 
     function filter() {
       var toks = tokens(input.value), shown = 0;
+      var hideDone = document.body.classList.contains('hide-done');
       rows.forEach(function (r) {
         var ok = !toks.length || hasAll(r.getAttribute('data-search') || '', toks);
+        if (ok && hideDone && r.classList.contains('done')) ok = false;
         r.hidden = !ok;
         if (ok) shown++;
       });
@@ -62,7 +64,7 @@
         if (h && h.tagName === 'H2') h.hidden = !any;
       });
       empty.hidden = shown > 0;
-      status.textContent = toks.length ? 'Showing ' + shown + ' of ' + plural(rows.length, 'problem') : '';
+      status.textContent = (toks.length || hideDone) ? 'Showing ' + shown + ' of ' + plural(rows.length, 'problem') + (hideDone ? ' (done hidden)' : '') : '';
       syncUrl();
     }
     input.addEventListener('input', filter);
@@ -121,13 +123,23 @@
     list.innerHTML = '';
     hits.slice(0, LIMIT).forEach(function (h) {
       var p = h.p, li = el('li');
-      var a = el('a', 'result-title', p.t);
+      if (window.dsaProgress && window.dsaProgress.isDone(p.id)) li.className = 'done';
+      var a = el('a', 'result-title', (window.dsaProgress && window.dsaProgress.isDone(p.id) ? '✓ ' : '') + p.t);
       a.href = base + 'p/' + p.id + '.html';
       a.target = '_blank';
       a.rel = 'noopener';
       var badge = el('span', 'badge badge-' + p.d.toLowerCase(), p.d);
       var meta = el('span', 'result-meta', p.p + (p.s ? ' › ' + p.s : '') + ' · ' + p.h.join(' ') + ' · ID ' + p.id);
-      li.appendChild(a); li.appendChild(badge); li.appendChild(meta);
+      li.appendChild(a); li.appendChild(badge);
+      // practice links (same data as the Problem link column)
+      var links = p.l || {};
+      [['leetcode', 'LeetCode ↗'], ['gfg', 'GFG ↗'], ['practice', (links.practice_site || 'Practice') + ' ↗']].forEach(function (k) {
+        if (!links[k[0]]) return;
+        var pl = el('a', 'result-link', k[1]);
+        pl.href = links[k[0]]; pl.target = '_blank'; pl.rel = 'noopener';
+        li.appendChild(pl);
+      });
+      li.appendChild(meta);
       list.appendChild(li);
     });
     if (!hits.length) list.appendChild(el('li', 'search-empty', 'No problems match. Try fewer or shorter words.'));
