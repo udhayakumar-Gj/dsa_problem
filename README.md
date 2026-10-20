@@ -3,7 +3,7 @@
 Explanations and **Java** solutions for every problem in Striver's A2Z DSA sheet, the SDE sheet and Blind 75
 (583 unique problems). Each article walks from brute force to the optimal approach with code, complexity and pitfalls.
 
-Site: https://udhayakumar-gj.github.io/dsa-java-articles/
+Site: https://udhayakumar-gj.github.io/dsa_problem/
 
 Forked from [manoshrinivasnm-glitch/dsa-java-articles](https://github.com/manoshrinivasnm-glitch/dsa-java-articles),
 which wrote the articles. This copy adds a **Problem link** column to every problem table: the LeetCode problem when
@@ -47,7 +47,7 @@ Every page URL is derived from the TUF ID, so a single formula fixes the whole R
 With the TUF ID in column `M` (A2Z tab) or `K` (SDE and Blind 75 tabs):
 
 ```
-=HYPERLINK("https://udhayakumar-gj.github.io/dsa-java-articles/p/"&M2&".html","Article")
+=HYPERLINK("https://udhayakumar-gj.github.io/dsa_problem/p/"&M2&".html","Article")
 ```
 
 ## Verify locally (optional)
@@ -68,7 +68,7 @@ Needs Ruby 3+ with the `jekyll`, `jekyll-seo-tag`, `kramdown-parser-gfm` and `we
 
 ```
 python3 tools/build_site.py
-jekyll serve --baseurl /dsa-java-articles   # then open http://127.0.0.1:4000/dsa-java-articles/
+jekyll serve --baseurl /dsa_problem   # then open http://127.0.0.1:4000/dsa_problem/
 ```
 
 ## Publishing

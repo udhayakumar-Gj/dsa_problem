@@ -1,8 +1,8 @@
 # dsa-java-articles — notes for future sessions
 
 Udhayakumar's copy of `manoshrinivasnm-glitch/dsa-java-articles` (Jekyll site, 583 Striver A2Z/SDE/Blind-75 articles
-with Java solutions). Hosted at https://udhayakumar-gj.github.io/dsa-java-articles/ once pushed; `origin` is
-`udhayakumar-Gj/dsa-java-articles`, `upstream` is the original (merge from it with `git fetch upstream && git merge upstream/main`).
+with Java solutions). Hosted at https://udhayakumar-gj.github.io/dsa_problem/ once pushed; `origin` is
+`udhayakumar-Gj/dsa_problem` (the local folder is still named dsa-java-articles), `upstream` is the original (merge from it with `git fetch upstream && git merge upstream/main`).
 
 ## What this fork adds (see README for the user-facing version)
 
@@ -34,7 +34,7 @@ python3 tools/check_links.py     # slow, hits the network; run after editing lin
 ```
 
 Local preview: Homebrew Ruby 4 + gems were installed for this; the binary is
-`/opt/homebrew/lib/ruby/gems/4.0.0/bin/jekyll` (not on PATH). `jekyll serve --baseurl /dsa-java-articles` from the
-repo root, then open http://localhost:4000/dsa-java-articles/. `_site/` is git-ignored.
+`/opt/homebrew/lib/ruby/gems/4.0.0/bin/jekyll` (not on PATH). `jekyll serve --baseurl /dsa_problem` from the
+repo root, then open http://localhost:4000/dsa_problem/. `_site/` is git-ignored.
 
 GitHub Pages: branch `main`, folder `/ (root)`. `_config.yml` `url`/`baseurl`/`repo_url` are already set for this account.
