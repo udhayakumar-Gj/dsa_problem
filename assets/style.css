@@ -85,12 +85,10 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid var(--accent);bac
 .track label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .track input[type=file]{display:none}
 .track .shuffle{border-color:var(--btn-bg);color:var(--btn-bg);font-weight:600}
-.track-article{margin:.4em 0 0}
 .track-hint{font-size:.8rem}
-.done-toggle{min-width:118px}
-.done-toggle.is-done{background:var(--ok);border-color:var(--ok);color:#fff}
-.done-box{width:16px;height:16px;margin:0;cursor:pointer;accent-color:var(--ok);vertical-align:middle}
-.prob-table td.done-cell{text-align:center;width:1%}
+.track code{font-size:.85em}
+.pill-solved{border-color:var(--ok);color:var(--ok);font-weight:600}
+.prob-table td.done-cell{text-align:center;width:1%;color:var(--ok);font-weight:700}
 .prob-table tr.done td:nth-child(2) a{color:var(--muted);text-decoration:line-through}
 .prob-table tr.done td:nth-child(2) a:hover{text-decoration:line-through underline}
 .topic-list .done-count{color:var(--ok);font-weight:600}

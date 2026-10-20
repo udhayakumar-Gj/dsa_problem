@@ -10,9 +10,16 @@ with Java solutions). Hosted at https://udhayakumar-gj.github.io/dsa-java-articl
   `leetcode:` (+ `leetcode_premium: true` when LeetCode locks it), `gfg:` (`/problems/<slug>/1` practice URL),
   `practice:` + `practice_site:` for any other judge (TUF+ `takeuforward.org/practice/dsa/<slug>`, Code360).
   Preference order LeetCode → GFG → other; both are shown when both are set. 26 pure-theory rows have none ("—").
-- **Done tracking + 🎲 Random** in `assets/progress.js`: solved marks live in the browser's `localStorage`
-  (`dsa-progress`), Export/Import/Reset on the Topics page, `Hide done` on table pages, "Mark as done" on articles.
-  Static site, so there is no cross-device sync beyond export/import.
+- **Solved status is static**: `_data/solved.json` (`ids` = TUF ids, `synced` = date) is written by
+  `tools/sync_tuf.py` from the user's takeUforward prep-hub sheet and rendered by `build_site.py` (row class `done`,
+  Solved column, counts, `done` flag in `search-index.json`, "✓ Solved" pill via `site.data.solved.ids contains page.id`).
+  The user explicitly did NOT want browser-memory (localStorage) tracking; `assets/progress.js` only does 🎲 Random
+  (prefers unsolved) and the hide-solved toggle.
+- **TUF sheet facts**: prep-hub pages (`takeuforward.org/prep-hub/strivers-a2z-dsa-sheet`) embed a tree whose problem
+  nodes carry the TUF `id` (== our `p/<id>.md`) and `/practice/dsa/<slug>` hrefs; login is at
+  `takeuforward.org/get-started?type=login`; the backend is `backend-go.takeuforward.org/api/v2/...`. The
+  authenticated per-problem progress endpoint goes in `TUF_PROGRESS_URL` for `sync_tuf.py --cookie`
+  (use `{sheet}` as the placeholder for the sheet slug); `--from-json` accepts any saved response shape.
 - `tools/check_links.py` live-checks every link (LeetCode GraphQL + GFG page titles; GFG returns 200 for bad slugs).
 
 ## Workflow

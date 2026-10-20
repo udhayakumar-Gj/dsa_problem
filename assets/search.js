@@ -64,7 +64,7 @@
         if (h && h.tagName === 'H2') h.hidden = !any;
       });
       empty.hidden = shown > 0;
-      status.textContent = (toks.length || hideDone) ? 'Showing ' + shown + ' of ' + plural(rows.length, 'problem') + (hideDone ? ' (done hidden)' : '') : '';
+      status.textContent = (toks.length || hideDone) ? 'Showing ' + shown + ' of ' + plural(rows.length, 'problem') + (hideDone ? ' (solved hidden)' : '') : '';
       syncUrl();
     }
     input.addEventListener('input', filter);
@@ -123,8 +123,8 @@
     list.innerHTML = '';
     hits.slice(0, LIMIT).forEach(function (h) {
       var p = h.p, li = el('li');
-      if (window.dsaProgress && window.dsaProgress.isDone(p.id)) li.className = 'done';
-      var a = el('a', 'result-title', (window.dsaProgress && window.dsaProgress.isDone(p.id) ? '✓ ' : '') + p.t);
+      if (p.done) li.className = 'done';
+      var a = el('a', 'result-title', (p.done ? '✓ ' : '') + p.t);
       a.href = base + 'p/' + p.id + '.html';
       a.target = '_blank';
       a.rel = 'noopener';

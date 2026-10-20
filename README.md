@@ -21,15 +21,23 @@ the question is on LeetCode, otherwise the GeeksforGeeks practice problem, other
 | `tools/check_java.sh` | Compiles every Java file and runs its tests. Also runs in GitHub Actions on every push. |
 | `ARTICLE_GUIDE.md` | The writing and coding standard every article follows. |
 
-## Tracking what you have solved
+## Solved status (synced from takeUforward)
 
-Every table has a **Done** checkbox per problem and every article a **Mark as done** button. Solved marks are stored
-in the browser's `localStorage` (the site is static, there is no server), so they persist on that browser and device.
-The Topics page shows overall and per-topic counts and has **Export progress** / **Import** (a small JSON file) to move
-marks between browsers or devices, plus **Reset**. Table pages can **Hide done** rows.
+Solved marks are **static and committed**: `_data/solved.json` lists the TUF ids you have solved, and
+`tools/build_site.py` renders them as the **Solved** column (✓), the per-page "n of m solved" lines, the per-topic
+counts on the Topics page and a "✓ Solved" pill on the article. Nothing is kept in the browser.
 
-**🎲 Random** (header link, and the "Random problem" buttons) opens a problem you have not marked done: from the whole
-sheet on the Topics page and in the header, from the current page's visible rows on topic / All-problems pages.
+The list comes from your own takeUforward prep-hub sheet, where problem ids are the same TUF ids this repo uses:
+
+```
+tools/sync_tuf.py --cookie "<Cookie header of a logged-in takeuforward.org request>"   # pull and merge
+tools/sync_tuf.py --from-json progress.json    # same, from a saved API response
+tools/sync_tuf.py --ids 38,43  /  --unsolve 38  /  --clear  /  --show
+```
+
+Then commit `_data/solved.json` and the regenerated pages. Table pages can **Hide solved** rows, and
+**🎲 Random** (header link and per-page buttons) opens a random unsolved problem: from the whole sheet in the header
+and on the Topics page, from the rows currently shown on topic / All-problems pages.
 
 ## Linking from the progress sheet
 
