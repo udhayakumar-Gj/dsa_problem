@@ -28,13 +28,30 @@
     if (e.key === 'Escape') { input.value = ''; input.dispatchEvent(new Event('input')); }
   });
 
-  // prefill from ?q=
+  // prefill from ?q= and ?d=
   var params = new URLSearchParams(location.search);
   if (params.get('q')) input.value = params.get('q');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.filters .chip'));
+  var diff = '';
+  function setDiff(d, silent) {
+    diff = d || '';
+    chips.forEach(function (c) {
+      var on = (c.getAttribute('data-difficulty') || '') === diff;
+      c.classList.toggle('is-active', on);
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (!silent) input.dispatchEvent(new Event('input'));
+  }
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () { setDiff(c.getAttribute('data-difficulty') || ''); });
+  });
+  if (params.get('d') && chips.length) setDiff(params.get('d'), true);
+  var DIFF_LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
   function syncUrl() {
     if (!history.replaceState) return;
     var u = new URL(location.href);
     if (input.value.trim()) u.searchParams.set('q', input.value.trim()); else u.searchParams.delete('q');
+    if (diff) u.searchParams.set('d', diff); else u.searchParams.delete('d');
     history.replaceState(null, '', u.toString());
   }
 
@@ -52,6 +69,7 @@
       var hideDone = document.body.classList.contains('hide-done');
       rows.forEach(function (r) {
         var ok = !toks.length || hasAll(r.getAttribute('data-search') || '', toks);
+        if (ok && diff && r.getAttribute('data-difficulty') !== diff) ok = false;
         if (ok && hideDone && r.classList.contains('done')) ok = false;
         r.hidden = !ok;
         if (ok) shown++;
@@ -64,7 +82,10 @@
         if (h && h.tagName === 'H2') h.hidden = !any;
       });
       empty.hidden = shown > 0;
-      status.textContent = (toks.length || hideDone) ? 'Showing ' + shown + ' of ' + plural(rows.length, 'problem') + (hideDone ? ' (solved hidden)' : '') : '';
+      var notes = [];
+      if (diff) notes.push(DIFF_LABEL[diff] + ' only');
+      if (hideDone) notes.push('solved hidden');
+      status.textContent = (toks.length || hideDone || diff) ? 'Showing ' + shown + ' of ' + plural(rows.length, 'problem') + (notes.length ? ' (' + notes.join(', ') + ')' : '') : '';
       syncUrl();
     }
     input.addEventListener('input', filter);
@@ -88,6 +109,8 @@
   }
 
   function score(p, toks, q) {
+    if (diff && String(p.d).toLowerCase() !== diff) return -1;
+    if (!toks.length) return 0;                                                 // chip only: keep sheet order
     if (!hasAll(p.q, toks)) return -1;
     if (/^\d+$/.test(q) && String(p.id) === q) return 1000;
     var title = norm(p.t), s = 0;
@@ -113,7 +136,7 @@
   function render() {
     var toks = tokens(input.value);
     syncUrl();
-    if (!toks.length) { list.hidden = true; list.innerHTML = ''; status.textContent = ''; return; }
+    if (!toks.length && !diff) { list.hidden = true; list.innerHTML = ''; status.textContent = ''; return; }
     if (!data) { status.textContent = 'Loading…'; load().then(render); return; }
     var q = toks.join(' ');
     var hits = [];
@@ -145,24 +168,28 @@
     if (!hits.length) list.appendChild(el('li', 'search-empty', 'No problems match. Try fewer or shorter words.'));
     list.hidden = false;
 
-    var msg = plural(hits.length, 'match', 'matches');
+    var msg = plural(hits.length, 'match', 'matches') + (diff ? ' (' + DIFF_LABEL[diff] + ' only)' : '');
     status.textContent = '';
     status.appendChild(document.createTextNode(msg));
     if (hits.length > LIMIT) {
-      status.appendChild(document.createTextNode(', showing the top ' + LIMIT + '. '));
-      var more = el('a', null, 'See all matches in All problems');
-      more.href = allUrl + '?q=' + encodeURIComponent(input.value.trim());
+      status.appendChild(document.createTextNode(', showing the first ' + LIMIT + '. '));
+      var more = el('a', null, 'See all in All problems');
+      var qs = new URLSearchParams();
+      if (input.value.trim()) qs.set('q', input.value.trim());
+      if (diff) qs.set('d', diff);
+      more.href = allUrl + '?' + qs.toString();
       status.appendChild(more);
     }
   }
 
   input.addEventListener('input', render);
   input.addEventListener('focus', load, { once: true });
+  chips.forEach(function (c) { c.addEventListener('mouseenter', load, { once: true }); });
   input.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       var first = list.querySelector('a.result-title');
       if (first) { e.preventDefault(); window.open(first.href, '_blank', 'noopener'); }
     }
   });
-  if (input.value) render();
+  if (input.value || diff) render();
 })();

@@ -95,6 +95,18 @@ blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid var(--accent);bac
 .prob-table tr.done td:nth-child(2) a:hover{text-decoration:line-through underline}
 .topic-list .done-count{color:var(--ok);font-weight:600}
 .nav-random.busy{opacity:.5}
+/* difficulty filter chips */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:.5em 0 .2em}
+.chip{font:inherit;font-size:.85rem;line-height:1.4;padding:3px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);cursor:pointer}
+.chip small{font-size:.78em;color:var(--muted);margin-left:2px}
+.chip:hover:not(:disabled){border-color:var(--muted)}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.chip.is-active{background:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-fg)}
+.chip.is-active small{color:inherit;opacity:.8}
+.chip-easy.is-active{background:var(--easy);border-color:var(--easy);color:#fff}
+.chip-medium.is-active{background:var(--medium);border-color:var(--medium);color:#fff}
+.chip-hard.is-active{background:var(--hard);border-color:var(--hard);color:#fff}
+.chip:focus-visible{outline:2px solid var(--btn-bg);outline-offset:2px}
 /* problem search */
 .search{margin:1.2em 0 .6em}
 .search input{width:100%;font:inherit;font-size:1rem;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg)}

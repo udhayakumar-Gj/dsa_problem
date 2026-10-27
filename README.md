@@ -37,6 +37,10 @@ tools/sync_tuf.py --ids 38,43  /  --unsolve 38  /  --clear  /  --show
 
 Then commit `_data/solved.json` and the regenerated pages. Table pages can **Hide solved** rows.
 
+**Difficulty filter**: Easy / Medium / Hard chips under the search box on every table page and on the Topics page;
+they combine with the text search and "Hide solved", and the random buttons pick from what is shown. The choice is
+kept in the URL (`?d=easy`) so filtered views can be bookmarked.
+
 Two pickers: **🎲 Random** opens a random *unsolved* problem and **🔁 Revise** a random *solved* one. Both exist as
 header links (whole sheet) and as buttons on the Topics page (whole sheet) and on topic / All-problems pages
 (the rows currently shown).

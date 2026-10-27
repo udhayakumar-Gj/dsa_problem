@@ -118,7 +118,7 @@ def row(p):
     sheets = ' '.join(SHEET_LABEL[s] for s in p['sheets'])
     if solved(p): cls = (cls[:-1] + ' done"') if cls else ' class="done"'
     done = (f'<td class="done-cell" title="{SOLVED_TITLE}">\u2713</td>' if solved(p) else '<td class="done-cell"></td>')
-    return (f'<tr{cls} data-id="{p["id"]}" data-search="{e(search_text(p))}"><td>{p["id"]}</td><td>{title}</td>'
+    return (f'<tr{cls} data-id="{p["id"]}" data-difficulty="{p["difficulty"].lower()}" data-search="{e(search_text(p))}"><td>{p["id"]}</td><td>{title}</td>'
             f'<td><span class="badge badge-{p["difficulty"].lower()}">{p["difficulty"]}</span></td>'
             f'<td>{e(p["section"])}</td><td>{sheets}</td><td class="plink">{link_cell(article_links(p))}</td>{done}</tr>')
 
@@ -130,6 +130,16 @@ def search_box(mode, placeholder, extra=''):
 SEARCH_SCRIPT = '<script src="{{ \'/assets/search.js\' | relative_url }}?v={{ site.time | date: \'%s\' }}" defer></script>'
 
 def _pct(n, total): return round(100 * n / total) if total else 0
+
+DIFFS = ('Easy', 'Medium', 'Hard')
+def difficulty_chips(ps):
+    """All / Easy / Medium / Hard buttons with counts; search.js applies them on top of the text filter."""
+    counts = {d: sum(1 for p in ps if p['difficulty'] == d) for d in DIFFS}
+    chips = [f'<button type="button" class="chip is-active" data-difficulty="" aria-pressed="true">All <small>{len(ps)}</small></button>']
+    for d in DIFFS:
+        dis = ' disabled' if not counts[d] else ''
+        chips.append(f'<button type="button" class="chip chip-{d.lower()}" data-difficulty="{d.lower()}" aria-pressed="false"{dis}>{d} <small>{counts[d]}</small></button>')
+    return '<div class="filters" role="group" aria-label="Filter by difficulty">' + ''.join(chips) + '</div>'
 
 def track_table(ps):
     """Static progress line under the search box of a table page: solved count, hide-solved toggle, random pick."""
@@ -163,6 +173,7 @@ lines = ['---', 'title: Topics', 'permalink: /', '---',
          track_index(),
          search_box('index', f'Search {len(problems)} problems by name, topic or TUF ID',
                     ' data-index="{{ \'/assets/search-index.json\' | relative_url }}" data-all="{{ \'/all.html\' | relative_url }}"'),
+         difficulty_chips(problems),
          '<ul class="search-results" hidden></ul>',
          '<ul class="topic-list">']
 for topic, ps in by_topic.items():
@@ -175,7 +186,7 @@ open(os.path.join(ROOT, 'index.md'), 'w', encoding='utf-8').write('\n'.join(line
 
 # all.md
 lines = ['---', 'title: All problems', '---', f'<p>All {len(problems)} problems in sheet order, keyed by TUF ID.</p>',
-         search_box('table', 'Filter by name, topic, section, difficulty or TUF ID'), track_table(problems), TABLE_HEAD]
+         search_box('table', 'Filter by name, topic, section or TUF ID'), difficulty_chips(problems), track_table(problems), TABLE_HEAD]
 lines += [row(p) for p in problems]
 lines.append('</tbody></table>')
 lines.append(SEARCH_SCRIPT)
@@ -184,7 +195,7 @@ open(os.path.join(ROOT, 'all.md'), 'w', encoding='utf-8').write('\n'.join(lines)
 # topics/*.md
 for topic, ps in by_topic.items():
     lines = ['---', f'title: "{topic}"', '---', f'<p><a href="{{{{ "/" | relative_url }}}}">← All topics</a></p>',
-             search_box('table', f'Filter {len(ps)} {html.escape(topic)} problems'), track_table(ps)]
+             search_box('table', f'Filter {len(ps)} {html.escape(topic)} problems'), difficulty_chips(ps), track_table(ps)]
     sections = collections.OrderedDict()
     for p in ps:
         sections.setdefault(p['section'], []).append(p)
